@@ -1,0 +1,12 @@
+{% extends "base_generic.html" %}
+
+{% block content %}
+    <h3>Host</h3>
+    <p> {{ host }} </p>
+    <h3>Guests</h3>
+    <ul>
+        {% for guestaction in guestaction_list %}
+            <li>{{ guestaction.guest.name }} - {{ guestaction.guest.note }} </li>
+        {% endfor %}
+    </ul>
+{% endblock %}

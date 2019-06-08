@@ -1,8 +1,11 @@
 from django.contrib import admin
 from catalog.models import Person, HostAction, GuestAction
 
-# Register your models here.
-admin.site.register(Person)
+
+@admin.register(Person)
+class PersonAdmin(admin.ModelAdmin):
+    list_filter = ('active','name')
+
 
 @admin.register(HostAction)
 class HostActionAdmin(admin.ModelAdmin):

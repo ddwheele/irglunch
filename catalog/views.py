@@ -1,12 +1,12 @@
-from django.shortcuts import render
-from catalog.models import Person, HostAction, GuestAction
 import datetime
+from django.shortcuts import render
+from django.views.generic import ListView
+from catalog.models import Person, HostAction, GuestAction
 
 # if the first of the month is the key (Monday=1, Sunday=7)
 # then the value is the date of the first Tuesday
 tues_translator = {1:2, 2:1, 3:7, 4:6, 5:5, 6:4, 7:3}
 
-# Create your views here.
 def index(request):
     """"View function for home page"""
     today = datetime.date.today()
@@ -35,9 +35,16 @@ def index(request):
                 context['host'+str(i)] = 'unassigned'
     
     return render(request, 'index.html', context=context)
+ 
+class GuestList(ListView):
+    model = GuestAction
+    context_object_name = 'guestaction_list' 
+    template_name = 'guestaction_list.html'
 
-
-
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['host'] = HostAction.objects.all()
+        return context
 
 
 
