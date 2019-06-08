@@ -14,32 +14,58 @@ def index(request):
     weekday = the_first.isoweekday()
     month_name = today.strftime("%B")
 
-    tues = []
     week = datetime.timedelta(days=7)
-    tues.append( the_first.replace( day=tues_translator[weekday] ))
-    for i in range(1,5):
-        tues.append(tues[0] + (i*week))
+    tues0 = the_first.replace( day=tues_translator[weekday] )
 
     context = {
         'month_name' : today.strftime("%B"),
         'year' : today.year,
-        'month' : today.month,
-        'week1' : tues[0].day,
-        'week2' : tues[1].day,
-        'week3' : tues[2].day,
-        'week4' : tues[3].day,
-        'host1' : 'alex',
-        'host2' : 'betty',
-        'host3' : 'cory',
-        'host4' : 'danielle'
-        
     } 
 
-    if tues[4].month == tues[0].month:
-        context['week5'] = tues[5].day
-
+    for i in range(5):
+        next_tues = tues0 + i*week
+        if next_tues.month == tues0.month:
+            context['week'+str(i)] = next_tues
+            next_host = HostAction.objects.filter(date__year = next_tues.year,
+						  date__month = next_tues.month,
+						  date__day = next_tues.day)
+            if next_host.exists():
+                context['host'+str(i)] = next_host[0].host.name
+            else:
+                context['host'+str(i)] = 'unassigned'
     
     return render(request, 'index.html', context=context)
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
     # Then you can click on each date and have it list the host, guests,
