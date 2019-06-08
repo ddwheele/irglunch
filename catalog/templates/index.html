@@ -1,0 +1,13 @@
+{% extends "base_generic.html" %}
+
+{% block content %}
+  <h1>IRG Lunch Home</h1>
+  <p>Welcome to the IRG Lunch website!</p>
+  <h3>Lunch Hosts for {{ month_name }} {{ year }}:</h3>
+  <ul>
+      <li>{{ month }}/{{ week1 }}: {{ host1 }}</li>
+      <li>{{ month }}/{{ week2 }}: {{ host2 }}</li>
+      <li>{{ month }}/{{ week3 }}: {{ host3 }}</li>
+      <li>{{ month }}/{{ week4 }}: {{ host4 }}</li>
+ </ul> 
+{% endblock %}

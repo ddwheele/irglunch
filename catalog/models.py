@@ -10,36 +10,21 @@ class Person(models.Model):
     def __str__(self):
         return self.name
 
-class TheHost(models.Model):
+class HostAction(models.Model):
     """Represents one time a Person brings IRG lunch"""
-    person = models.ForeignKey('Person', on_delete=models.SET_NULL, null=True, help_text="Person who brings IRG lunch")
-    lunch_event = models.ForeignKey('LunchEvent', on_delete=models.SET_NULL, null=True, help_text="Instance of IRG Lunch")
+    host = models.ForeignKey('Person', on_delete=models.SET_NULL, null=True, help_text="Person who brings IRG lunch")
+    date = models.DateField(null=True, blank=True, help_text="Date of the IRG Lunch hosted")
 
     def __str__(self):
-        return self.person.name + " brought IRG Lunch"
+        return self.host.name + " brought IRG Lunch on " + str(self.date)
 
-class AGuest(models.Model):
+class GuestAction(models.Model):
     """Represents one time a Person attends IRG lunch"""
-    person = models.ForeignKey('Person', on_delete=models.SET_NULL, null=True, help_text="Person who attends IRG lunch")
-    lunch_event = models.ForeignKey('LunchEvent', on_delete=models.SET_NULL, null=True, help_text="Instance of IRG Lunch")
-    note = models.CharField(max_length=200, help_text="Note to host, ie, vegetarian")
+    guest = models.ForeignKey('Person', on_delete=models.SET_NULL, null=True, help_text="Person who attends IRG lunch")
+    date = models.DateField(null=True, blank=True, help_text="Date of the IRG Lunch attended")
+    note = models.CharField(max_length=500, blank=True, help_text="Note to host, ie, vegetarian")
 
     def __str__(self):
-        return self.person.name + " attended IRG Lunch"
-
-class LunchEvent(models.Model):
-    """Represents the IRG Lunch that happened on a particular date"""
-    date = models.DateField(null=True, blank=True, help_text="Date of this IRG Lunch")
-    host = models.ForeignKey('TheHost', on_delete=models.SET_NULL, null=True, help_text="Person who brings IRG lunch")
-    guest = models.ForeignKey('AGuest', on_delete=models.SET_NULL, null=True, help_text="People who attend IRG lunch")
-
-    def __str__(self):
-        return self.date
-
-    def get_absolute_url(self):
-        """Returns the url to access a detail record for this lunch"""
-        return reverse('lunch-detail', args=[str(self.id)])
-
-
+        return self.guest.name + " attended IRG Lunch on " + str(self.date)
 
 
