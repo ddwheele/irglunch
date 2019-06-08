@@ -18,6 +18,9 @@ class HostAction(models.Model):
     def __str__(self):
         return self.host.name + " brought IRG Lunch on " + str(self.date)
 
+    def get_absolute_url(self):
+        return reverse('lunch-view', {'year':self.date.year,'month':self.date.month, 'day':self.date.day})
+
 class GuestAction(models.Model):
     """Represents one time a Person attends IRG lunch"""
     guest = models.ForeignKey('Person', on_delete=models.SET_NULL, null=True, help_text="Person who attends IRG lunch")

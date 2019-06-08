@@ -35,6 +35,25 @@ def index(request):
                 context['host'+str(i)] = 'unassigned'
     
     return render(request, 'index.html', context=context)
+
+def lunch_list_view(request, year, month, day):
+    context = {}
+    host_action = HostAction.objects.filter(date__year = year,
+                                            date__month = month,
+                                            date__day = day)
+    if host_action.exists():
+        context['host'] = host_action[0].host.name
+    else:
+        context['host'] = 'unassigned'
+
+    guest_actions = GuestAction.objects.filter(date__year = year,
+                                               date__month = month,
+                                               date__day = day)
+
+    context['guestaction_list'] = guest_actions    
+
+    return render(request, 'catalog/guestaction_list.html', context=context)
+
  
 class GuestList(ListView):
     model = GuestAction
@@ -43,9 +62,6 @@ class GuestList(ListView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        context['host'] = HostAction.objects.all()
-        return context
-
 
 
 
