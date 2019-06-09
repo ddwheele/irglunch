@@ -7,7 +7,7 @@ from catalog.models import Person, HostAction, GuestAction
 # then the value is the date of the first Tuesday
 tues_translator = {1:2, 2:1, 3:7, 4:6, 5:5, 6:4, 7:3}
 
-def index(request):
+def oldindex(request):
     """"View function for home page"""
     today = datetime.date.today()
     the_first = today.replace(day=1)
@@ -48,22 +48,20 @@ def lunch_list_view(request, year, month, day):
 
     guest_actions = GuestAction.objects.filter(date__year = year,
                                                date__month = month,
-                                               date__day = day)
+                                               date__day = day).order_by('guest')
 
     context['guestaction_list'] = guest_actions    
 
     return render(request, 'catalog/guestaction_list.html', context=context)
 
- 
-class GuestList(ListView):
-    model = GuestAction
-    context_object_name = 'guestaction_list' 
-    template_name = 'guestaction_list.html'
+def index(request):
+    context = {}
+    today = datetime.date.today()
+    host_action_list = HostAction.objects.filter(date__year = today.year,
+                                            date__month = today.month).order_by('date')
+    context['host'] = host_action_list
 
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-
-
+    return render(request, 'index.html', context=context)
 
 
 
@@ -91,6 +89,6 @@ class GuestList(ListView):
 
 
 
-    # Then you can click on each date and have it list the host, guests,
-    # and a form to add yourself
+
+
 

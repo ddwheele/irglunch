@@ -1,14 +1,15 @@
 {% extends "base_generic.html" %}
 
 {% block content %}
-  <h1>IRG Lunch Home</h1>
-  <p>Welcome to the IRG Lunch website!</p>
-  <h3>Lunch Hosts for {{ month_name }} {{ year }}:</h3>
-  <ul>
-      <li><a href="">{{ week0 }}</a>: {{ host0 }}</li>
-      <li><a href="">{{ week1 }}</a>: {{ host1 }}</li>
-      <li><a href="">{{ week2 }}</a>: {{ host2 }}</li>
-      <li><a href="">{{ week3 }}</a>: {{ host3 }}</li>
-      <li><a href="">{{ week4 }}</a>: {{ host4 }}</li>
- </ul> 
+    <h1>Welcome to the IRG Lunch page</h1>
+    <h3>IRG lunch for this month</h3>
+    {% if host %}
+    <ul>
+        {% for hostaction in host %}
+            <li><a href="{{ hostaction.get_absolute_url }}">{{ hostaction.date }}</a>: {{ hostaction.host.name }} </li>
+        {% endfor %}
+    </ul>
+    {% else %}
+      <p> There are no IRG Lunches scheduled for this month</p>
+    {% endif %}
 {% endblock %}
