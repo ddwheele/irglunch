@@ -2,6 +2,7 @@ import datetime
 from django.shortcuts import render
 from django.views.generic import ListView
 from catalog.models import Person, HostAction, GuestAction
+from django.contrib.auth.decorators import login_required
 
 # if the first of the month is the key (Monday=1, Sunday=7)
 # then the value is the date of the first Tuesday
@@ -36,6 +37,7 @@ def oldindex(request):
     
     return render(request, 'index.html', context=context)
 
+@login_required
 def lunch_list_view(request, year, month, day):
     context = {}
     host_action = HostAction.objects.filter(date__year = year,
@@ -54,6 +56,7 @@ def lunch_list_view(request, year, month, day):
 
     return render(request, 'catalog/guestaction_list.html', context=context)
 
+@login_required
 def index(request):
     context = {}
     today = datetime.date.today()
