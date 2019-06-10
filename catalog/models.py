@@ -6,6 +6,9 @@ class Person(models.Model):
     """Represents a person who hosts or eats IRG lunch"""
     name = models.CharField(max_length=50, help_text="Enter person's name or nickname")
     active = models.BooleanField(default=True, help_text='Is this person a possible IRG lunch host?')
+    num_guest_actions = models.IntegerField(default=0, help_text='Times person has attended IRG lunch')
+    num_host_actions = models.IntegerField(default=0, help_text='Times person has hosted IRG lunch')
+    last_hosted = models.DateField(null=True, blank=True, help_text='Date of last time person hosted IRG lunch')
 
     def __str__(self):
         return self.name
