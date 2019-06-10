@@ -1,8 +1,11 @@
 import datetime
+from django.http import HttpResponseRedirect
 from django.shortcuts import render
 from django.views.generic import ListView
+from django.urls import reverse
 from catalog.models import Person, HostAction, GuestAction
 from django.contrib.auth.decorators import login_required
+from catalog.forms import AddGuestForm
 
 # if the first of the month is the key (Monday=1, Sunday=7)
 # then the value is the date of the first Tuesday
@@ -53,6 +56,9 @@ def lunch_list_view(request, year, month, day):
                                                date__day = day).order_by('guest')
 
     context['guestaction_list'] = guest_actions    
+    context['year'] = year
+    context['month'] = month
+    context['day'] = day
 
     return render(request, 'catalog/guestaction_list.html', context=context)
 
@@ -66,9 +72,24 @@ def index(request):
 
     return render(request, 'index.html', context=context)
 
+@login_required
+def add_guest(request, year, month, day):
+    if request.method == 'POST':
+        
+        form = AddGuestForm(request.POST)
+        
+        if form.is_valid():
+            form.save()
+            return HttpResponseRedirect(reverse('lunch-view', kwargs={'year':year,'month':month,'day':day}))
+    else:
+        lunchdate = datetime.date(year, month, day)
+        form = AddGuestForm(initial={'date': lunchdate})
 
+    context = {
+        'form' : form
+    }
 
-
+    return render(request, 'catalog/add_guest.html', context)
 
 
 

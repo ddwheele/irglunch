@@ -9,4 +9,7 @@
             <li>{{ guestaction.guest.name }} - {{ guestaction.note }} </li>
         {% endfor %}
     </ul>
+
+    <a href="{% url 'add-guest' year month day%}">Add Guest</a>
+
 {% endblock %}
