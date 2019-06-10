@@ -4,7 +4,8 @@ from catalog.models import Person, HostAction, GuestAction
 
 @admin.register(Person)
 class PersonAdmin(admin.ModelAdmin):
-    list_filter = ('active','name')
+    list_display = ('name','active', 'num_guest_actions','num_host_actions','last_hosted')
+    list_filter = ('active','num_host_actions','num_guest_actions')
 
 
 @admin.register(HostAction)

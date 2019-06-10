@@ -12,7 +12,29 @@ from catalog.forms import AddGuestForm
 # if the first of the month is the key (Monday=1, Sunday=7)
 # then the value is the date of the first Tuesday
 tues_translator = {1:2, 2:1, 3:7, 4:6, 5:5, 6:4, 7:3}
-host_coefficient = 2 # each time you host, it removes this many chances from your probability
+host_coefficient = 1 # each time you host, it removes this many chances from your probability
+
+def assign_host(lunchdate):
+    a_month_ago = lunchdate - datetime.timedelta(days=31)
+    people = Person.objects.filter(active = True, last_hosted__lte=a_month_ago)
+    denominator = 0 # total chances of anybody being picked to host
+    for peep in people:
+        denominator += peep.num_guest_actions - host_coefficient * peep.num_host_actions
+ 
+    selected = random.randint(0,denominator)
+    chances = 0
+    for peep in people:
+        chances += peep.num_guest_actions - host_coefficient * peep.num_host_actions
+        if selected <= chances:    
+            ha = HostAction(date=lunchdate)
+            ha.host=peep
+            ha.save()
+            peep.num_host_actions = peep.num_host_actions + 1
+            peep.last_hosted = lunchdate
+            peep.save()
+            return 
+
+    #return people
 
 @login_required
 def calculate_lunch_month(request):
@@ -23,40 +45,12 @@ def calculate_lunch_month(request):
 
     week = datetime.timedelta(days=7)
 
-    people = Person.objects.filter(active = True)
-    denominator = 0 # total chances of anybody being picked to host
-    for peep in people:
-        denominator += peep.num_guest_actions - host_coefficient * peep.num_host_actions
-
- 
     first_tuesday = the_first.replace( day=tues_translator[weekday] )
 
-    ha1 = HostAction(date = first_tuesday)
- 
-    selected = random.randint(0,denominator)
-    chances = 0
-    for peep in people:
-        chances = peep.num_guest_actions - host_coefficient * peep.num_host_actions
-        if selected <= chances:    
-            ha1.host = peep
-            peep.num_host_actions = peep.num_host_actions + 1
-            ha1.save()
-            peep.save()
-            break
-
-
-#    for i in range(5):
-#        next_tues = first_tuesday + i*week
-#        if next_tues.month == first_tuesday.month:
-#            context['week'+str(i)] = next_tues
-#            next_host = HostAction.objects.filter(date__year = next_tues.year,
-#						  date__month = next_tues.month,
-#						  date__day = next_tues.day)
-#            if next_host.exists():
-#                context['host'+str(i)] = next_host[0].host.name
-#            else#:
-#                context['host'+str(i)] = 'unassigned'
-    
+    for i in range(5):
+        next_tues = first_tuesday + i*week
+        if next_tues.month == first_tuesday.month:
+            assign_host(next_tues)
     return HttpResponseRedirect('/')
 
 
