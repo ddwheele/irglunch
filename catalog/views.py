@@ -113,6 +113,9 @@ def add_guest(request, year, month, day):
     else:
         lunchdate = datetime.date(year, month, day)
         form = AddGuestForm(initial={'date': lunchdate})
+        all_people = Person.objects.all()
+        already_attending = Person.objects.select_related().filter(guestaction__date=lunchdate).distinct()
+        form.fields['guest'].queryset = all_people.difference(already_attending)
 
     context = {
         'form' : form
