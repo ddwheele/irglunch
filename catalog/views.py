@@ -9,22 +9,24 @@ from django.contrib.auth.decorators import login_required
 from catalog.forms import AddGuestForm
 
 
+HOST_COEFFICIENT = 1 # each time you host, it removes this many chances from your probability
+IMMUNITY_PERIOD = 31 # after you host, you won't be asked to host again for this many days
+
 # if the first of the month is the key (Monday=1, Sunday=7)
 # then the value is the date of the first Tuesday
 tues_translator = {1:2, 2:1, 3:7, 4:6, 5:5, 6:4, 7:3}
-host_coefficient = 1 # each time you host, it removes this many chances from your probability
 
 def assign_host(lunchdate):
-    a_month_ago = lunchdate - datetime.timedelta(days=31)
-    people = Person.objects.filter(active = True, last_hosted__lte=a_month_ago)
+    immune_date = lunchdate - datetime.timedelta(days=IMMUNITY_PERIOD)
+    people = Person.objects.filter(active = True, last_hosted__lte=immune_date)
     denominator = 0 # total chances of anybody being picked to host
     for peep in people:
-        denominator += peep.num_guest_actions - host_coefficient * peep.num_host_actions
+        denominator += peep.num_guest_actions - HOST_COEFFICIENT * peep.num_host_actions
  
     selected = random.randint(0,denominator)
     chances = 0
     for peep in people:
-        chances += peep.num_guest_actions - host_coefficient * peep.num_host_actions
+        chances += peep.num_guest_actions - HOST_COEFFICIENT * peep.num_host_actions
         if selected <= chances:    
             ha = HostAction(date=lunchdate)
             ha.host=peep
@@ -36,16 +38,26 @@ def assign_host(lunchdate):
 
     #return people
 
+def reset_hosted_dates(request):
+    people = Person.objects.all()
+    for peep in people:
+        peep.last_hosted = datetime.datetime(year=2000, month=5, day =5)
+        peep.save()
+    context = {}
+    context['peeps'] = people
+    return render(request, 'catalog/debug.html', context=context)
+
+#    return HttpResponseRedirect('/')
+
 @login_required
-def calculate_lunch_month(request):
+def calculate_month_of_assignments(request):
     """"View function for home page"""
     today = datetime.date.today()
     the_first = today.replace(day=1)
     weekday = the_first.isoweekday()
+    first_tuesday = the_first.replace( day=tues_translator[weekday] )
 
     week = datetime.timedelta(days=7)
-
-    first_tuesday = the_first.replace( day=tues_translator[weekday] )
 
     for i in range(5):
         next_tues = first_tuesday + i*week
@@ -55,7 +67,7 @@ def calculate_lunch_month(request):
 
 
 @login_required
-def lunch_list_view(request, year, month, day):
+def single_lunch_listing(request, year, month, day):
     context = {}
     host_action = HostAction.objects.filter(date__year = year,
                                             date__month = month,
@@ -74,7 +86,7 @@ def lunch_list_view(request, year, month, day):
     context['month'] = month
     context['day'] = day
 
-    return render(request, 'catalog/guestaction_list.html', context=context)
+    return render(request, 'catalog/single_lunch_listing.html', context=context)
 
 @login_required
 def index(request):
@@ -97,7 +109,7 @@ def add_guest(request, year, month, day):
             guest = form.cleaned_data['guest']
             guest.num_guest_actions = guest.num_guest_actions + 1
             guest.save()
-            return HttpResponseRedirect(reverse('lunch-view', kwargs={'year':year,'month':month,'day':day}))
+            return HttpResponseRedirect(reverse('single-lunch-listing', kwargs={'year':year,'month':month,'day':day}))
     else:
         lunchdate = datetime.date(year, month, day)
         form = AddGuestForm(initial={'date': lunchdate})
