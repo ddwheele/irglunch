@@ -1,12 +1,12 @@
 import datetime
 import random
 from django.http import HttpResponseRedirect
-from django.shortcuts import render
+from django.shortcuts import render, get_object_or_404
 from django.views.generic import ListView
 from django.urls import reverse
 from catalog.models import Person, HostAction, GuestAction
 from django.contrib.auth.decorators import login_required
-from catalog.forms import AddGuestForm
+from catalog.forms import AddGuestForm, ChangeHostForm
 
 
 HOST_COEFFICIENT = 1 # each time you host, it removes this many chances from your probability
@@ -28,8 +28,7 @@ def assign_host(lunchdate):
     for peep in people:
         chances += peep.num_guest_actions - HOST_COEFFICIENT * peep.num_host_actions
         if selected <= chances:    
-            ha = HostAction(date=lunchdate)
-            ha.host=peep
+            ha = HostAction(date=lunchdate, host=peep)
             ha.save()
             peep.num_host_actions = peep.num_host_actions + 1
             peep.last_hosted = lunchdate
@@ -46,8 +45,6 @@ def reset_hosted_dates(request):
     context = {}
     context['peeps'] = people
     return render(request, 'catalog/debug.html', context=context)
-
-#    return HttpResponseRedirect('/')
 
 @login_required
 def calculate_month_of_assignments(request):
@@ -73,18 +70,16 @@ def single_lunch_listing(request, year, month, day):
                                             date__month = month,
                                             date__day = day)
     if host_action.exists():
-        context['host'] = host_action[0].host.name
+        context['host_action'] = host_action[0]
     else:
-        context['host'] = 'unassigned'
+        context['host_action'] = 'unassigned'
 
     guest_actions = GuestAction.objects.filter(date__year = year,
                                                date__month = month,
                                                date__day = day).order_by('guest')
 
     context['guestaction_list'] = guest_actions    
-    context['year'] = year
-    context['month'] = month
-    context['day'] = day
+    context['date'] = datetime.date(year=year, month=month, day=day)
 
     return render(request, 'catalog/single_lunch_listing.html', context=context)
 
@@ -118,13 +113,47 @@ def add_guest(request, year, month, day):
         form.fields['guest'].queryset = all_people.difference(already_attending)
 
     context = {
-        'form' : form
+        'form' : form,
     }
 
     return render(request, 'catalog/add_guest.html', context)
 
+@login_required
+def change_host(request, pk):
+    host_action = get_object_or_404(HostAction, pk=pk)
 
+    shirking_host = host_action.host
+    past_hosted = HostAction.objects.filter(host=shirking_host).order_by('-date')
+    if past_hosted.exists() and past_hosted.count() > 1:
+        last_hosted = past_hosted[1].date
+    else:
+        last_hosted = datetime.datetime(year=1900,month=5,day=23)
 
+    if request.method == 'POST':
+        form = ChangeHostForm(request.POST)
+
+        if form.is_valid():
+            new_host = form.cleaned_data['host']
+            host_action.host = new_host
+            host_action.save()
+            new_host.num_host_actions = new_host.num_host_actions + 1
+            new_host.last_hosted = host_action.date
+            new_host.save()
+            shirking_host.num_host_actions = shirking_host.num_host_actions-1
+            shirking_host.last_hosted = last_hosted
+            shirking_host.save()
+            return HttpResponseRedirect(reverse('single-lunch-listing', kwargs={'year':host_action.date.year,
+                                                                                'month':host_action.date.month,
+                                                                                'day':host_action.date.day}))
+    else:
+        form = ChangeHostForm()
+
+    context = {
+        'form': form,
+        'host_action': host_action
+    }
+
+    return render(request, 'catalog/change_host.html', context)
 
 
 

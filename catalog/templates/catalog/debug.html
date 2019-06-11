@@ -1,0 +1,14 @@
+{% extends "base_generic.html" %}
+  
+{% block content %}
+    <h3>List</h3>
+    <p> {{ peeps }} </p>
+    <h3>List Extended</h3>
+    <ul>
+        {% for p in peeps %}
+            <li>{{ p.name }} </li>
+        {% endfor %}
+    </ul>
+
+{% endblock %}
+

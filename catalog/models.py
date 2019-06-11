@@ -1,3 +1,4 @@
+import uuid
 from django.db import models
 from django.urls import reverse
 import datetime as dt
@@ -17,6 +18,7 @@ class Person(models.Model):
 
 class HostAction(models.Model):
     """Represents one time a Person brings IRG lunch"""
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4,help_text='Unique ID for this hosting action')
     host = models.ForeignKey('Person', on_delete=models.SET_NULL, null=True, help_text="Person who brings IRG lunch")
     date = models.DateField(null=True, blank=True, help_text="Date of the IRG Lunch hosted")
 

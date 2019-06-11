@@ -1,5 +1,7 @@
 *.swp
 migrations/
+migrations/*
+catalog/migrations/*
 
 # Django #
 *.log

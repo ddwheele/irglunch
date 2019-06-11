@@ -1,8 +1,12 @@
 {% extends "base_generic.html" %}
 
 {% block content %}
+<h1>IRG Lunch on {{ date }} </h1>
+
     <h3>Host</h3>
-    <p> {{ host }} </p>
+    <p> {{ host_action.host.name }} </p>
+    <a href="{% url 'change-host' host_action.pk %}">Change Host</a>
+
     <h3>Guests</h3>
     <ul>
         {% for guestaction in guestaction_list %}
@@ -10,6 +14,6 @@
         {% endfor %}
     </ul>
 
-    <a href="{% url 'add-guest' year month day%}">Add Guest</a>
+    <a href="{% url 'add-guest' date.year date.month date.day%}">Add Guest</a>
 
 {% endblock %}
