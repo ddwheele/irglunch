@@ -4,11 +4,11 @@
     <h1>Welcome to the IRG Lunch page</h1>
     <h3>IRG lunch for this month</h3>
     {% if host %}
-    <ul>
+      <ul>
         {% for hostaction in host %}
             <li><a href="{{ hostaction.get_absolute_url }}">{{ hostaction.date }}</a>: {{ hostaction.host.name }} </li>
         {% endfor %}
-    </ul>
+      </ul>
     {% else %}
       <p> There are no IRG Lunches scheduled for this month</p>
     {% endif %}

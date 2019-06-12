@@ -93,6 +93,13 @@ def index(request):
 
     return render(request, 'index.html', context=context)
 
+def archive(request):
+    context = {}
+    today = datetime.date.today()
+    host_action_list = HostAction.objects.filter(date__lte=today).order_by('-date')
+    context['host_actions'] = host_action_list
+    return render(request, 'archive.html', context=context)
+
 @login_required
 def add_guest(request, year, month, day):
     if request.method == 'POST':

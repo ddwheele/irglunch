@@ -1,0 +1,15 @@
+{% extends "base_generic.html" %}   
+
+{% block content %}
+  <h1>IRG Lunch Archive</h1>
+  {% if host_actions %}
+    <ul>
+      {% for hostaction in host_actions %}
+         <li><a href="{{ hostaction.get_absolute_url }}">{{ hostaction.date }}</a>: {{ hostaction.host.name }} </li>
+      {% endfor %}
+    <ul>
+  {% else %}
+    <p> There are no IRG Lunches that occured in the past</p>
+  {% endif %}
+
+{% endblock %}
