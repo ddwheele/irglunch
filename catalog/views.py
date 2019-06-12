@@ -6,7 +6,7 @@ from django.views.generic import ListView
 from django.urls import reverse
 from catalog.models import Person, HostAction, GuestAction
 from django.contrib.auth.decorators import login_required
-from catalog.forms import AddGuestForm, ChangeHostForm
+from catalog.forms import AddGuestForm, ChangeHostForm, AddPersonForm
 
 
 HOST_COEFFICIENT = 1 # each time you host, it removes this many chances from your probability
@@ -15,7 +15,6 @@ IMMUNITY_PERIOD = 31 # after you host, you won't be asked to host again for this
 # if the first of the month is the key (Monday=1, Sunday=7)
 # then the value is the date of the first Tuesday
 tues_translator = {1:2, 2:1, 3:7, 4:6, 5:5, 6:4, 7:3}
-
 
 @login_required
 def calculate_current_month_assignments(request):
@@ -30,9 +29,8 @@ def calculate_next_month_assignments(request):
     calculate_month_of_assignments(day_next_month)
     return HttpResponseRedirect('next_month')
 
-# takes in a day, creates host assignments for each Tuesday in that month
 def calculate_month_of_assignments(a_day):
-    """"View function for home page"""
+    """takes in a day, creates host assignments for each Tuesday in that month"""
     the_first = a_day.replace(day=1)
     weekday = the_first.isoweekday()
     first_tuesday = the_first.replace( day=tues_translator[weekday] )
@@ -44,7 +42,7 @@ def calculate_month_of_assignments(a_day):
         if next_tues.month == first_tuesday.month:
             # make sure there isn't already a host assigned to that day
             host_action = HostAction.objects.filter(date=next_tues)
-            if host_action.exists():
+            if host_action.exists() and (host_action[0].host.name != 'unassigned'):
                 continue
             else:
                 assign_host(next_tues)
@@ -62,8 +60,15 @@ def assign_host(lunchdate):
         chances = 0
         for peep in people:
             chances += peep.num_guest_actions - HOST_COEFFICIENT * peep.num_host_actions
-            if selected <= chances:    
-                ha = HostAction(date=lunchdate, host=peep)
+            if selected <= chances:
+                actions = HostAction.objects.filter(date=lunchdate)
+                if actions.exists():
+                    ha = actions[0]
+                    ha.host = peep
+                    # caveat: we aren't decrementing hosted counts because
+                    # only 'unassigned' should ever be auto-reassigned
+                else:
+                    ha = HostAction(date=lunchdate, host=peep)
                 ha.save()
                 peep.num_host_actions = peep.num_host_actions + 1
                 peep.last_hosted = lunchdate
@@ -125,13 +130,25 @@ def next_month(request):
 
     return render(request, 'next_month.html', context=context)
   
+@login_required
+def add_person(request):
+    if request.method == 'POST':
+        form = AddPersonForm(request.POST)
+        if form.is_valid():
+            form.save()
+            return HttpResponseRedirect('/')
+    else:
+        form = AddPersonForm()
+
+    context = {
+        'form' : form,
+    }
+    return render(request, 'catalog/add_person.html', context)
 
 @login_required
 def add_guest(request, year, month, day):
     if request.method == 'POST':
-        
         form = AddGuestForm(request.POST)
-        
         if form.is_valid():
             form.save()
             guest = form.cleaned_data['guest']
@@ -198,8 +215,8 @@ def reset_hosted_dates(request):
     context['peeps'] = people
     return render(request, 'catalog/debug.html', context=context)
 
-# given a date, return a date in the next month
 def get_next_month(today):
+    """given a date, return a date in the next month"""
     next_month = today.month + 1
     if next_month == 13:
         next_year = today.year + 1

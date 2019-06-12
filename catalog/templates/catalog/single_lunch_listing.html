@@ -7,10 +7,12 @@
     <p> {{ host_action.host.name }} </p>
     <a href="{% url 'change-host' host_action.pk %}">Change Host</a>
 
+  <hr>
+
     <h3>Guests</h3>
     <ul>
         {% for guestaction in guestaction_list %}
-            <li>{{ guestaction.guest.name }} - {{ guestaction.note }} </li>
+            <li>{{ guestaction.guest.name }} {% if guestaction.note %} - {{ guestaction.note }} {% endif %}  </li>
         {% endfor %}
     </ul>
 

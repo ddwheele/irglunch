@@ -2,6 +2,11 @@ from django import forms
 
 from catalog.models import Person, GuestAction, HostAction
 
+class AddPersonForm(forms.ModelForm):
+    class Meta:
+        model = Person
+        fields = '__all__'
+
 class AddGuestForm(forms.ModelForm):
     class Meta:
         model = GuestAction
