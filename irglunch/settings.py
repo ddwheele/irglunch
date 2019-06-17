@@ -25,8 +25,8 @@ SECRET_KEY = os.environ.get('DJANGO_SECRET_KEY', 'm)q940#f-y^b=@kq5a36s4)1xzq(3g
 
 
 # SECURITY WARNING: don't run with debug turned on in production!
-#DEBUG = os.environ.get('DJANGO_DEBUG', '') != 'False'
-DEBUG = False
+DEBUG = os.environ.get('DJANGO_DEBUG', '') != 'False'
+#DEBUG = False
 
 ALLOWED_HOSTS = ['localhost','127.0.0.1','lunch.pennypenguin.net','radiant-caverns-85663.herokuapp.com']
 
