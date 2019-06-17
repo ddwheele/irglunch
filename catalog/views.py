@@ -82,6 +82,7 @@ def assign_host(lunchdate):
             nobody = nobody[0]
         else:
             nobody = Person(name=unassigned_name, active=False)
+            nobody.save()
         ha = HostAction(date=lunchdate, host=nobody)
         ha.save()
 
