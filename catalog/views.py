@@ -76,7 +76,10 @@ def assign_host(lunchdate):
                 return 
     else:
         # If we weren't able to assign anybody, give to "unassigned"
-        nobody = Person.objects.filter(name='unassigned')
+        unassigned_name = 'unassigned'
+        nobody = Person.objects.filter(name=unassigned_name)
+        if not nobody.exists():
+            nobody = Person(name=unassigned_name, active=False)
         ha = HostAction(date=lunchdate, host=nobody[0])
         ha.save()
 
