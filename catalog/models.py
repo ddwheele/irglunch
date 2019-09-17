@@ -23,7 +23,10 @@ class HostAction(models.Model):
     date = models.DateField(null=True, blank=True, help_text="Date of the IRG Lunch hosted")
 
     def __str__(self):
-        return self.host.name + " brought IRG Lunch on " + str(self.date)
+        hostname = "-"
+        if self.host is not None:
+            hostname = self.host.name
+        return hostname + " brought IRG Lunch on " + str(self.date)
 
     def get_absolute_url(self):
         return reverse('single-lunch-listing', kwargs={'year':self.date.year,'month':self.date.month, 'day':self.date.day})
@@ -35,6 +38,9 @@ class GuestAction(models.Model):
     note = models.CharField(max_length=500, blank=True, help_text="Note to host, ie, vegetarian")
 
     def __str__(self):
-        return self.guest.name + " attended IRG Lunch on " + str(self.date)
+        guestname = "-"
+        if self.guest is not None:
+            guestname = guest.host.name
+        return guestname + " attended IRG Lunch on " + str(self.date)
 
 
