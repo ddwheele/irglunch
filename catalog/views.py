@@ -42,7 +42,7 @@ def calculate_month_of_assignments(a_day):
         if next_tues.month == first_tuesday.month:
             # make sure there isn't already a host assigned to that day
             host_action = HostAction.objects.filter(date=next_tues)
-            if host_action.exists() and (host_action[0].host is not None) and (host_action[0].host.name != 'unassigned'):
+            if host_action.exists() and (host_action[0].host.name != 'unassigned'):
                 continue
             else:
                 assign_host(next_tues)
