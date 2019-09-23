@@ -5,7 +5,7 @@ from catalog.models import Person, GuestAction, HostAction
 class AddPersonForm(forms.ModelForm):
     class Meta:
         model = Person
-        fields = '__all__'
+        fields = ['name', 'active']
 
 class AddGuestForm(forms.ModelForm):
     class Meta:
