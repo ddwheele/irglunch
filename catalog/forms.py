@@ -18,3 +18,8 @@ class ChangeHostForm(forms.ModelForm):
     class Meta:
         model = HostAction
         fields = ['host']
+
+class AddCommentForm(forms.ModelForm):
+    class Meta:
+        model = HostAction
+        fields = ['comment']

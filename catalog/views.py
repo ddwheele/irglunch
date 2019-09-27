@@ -6,8 +6,7 @@ from django.views.generic import ListView
 from django.urls import reverse
 from catalog.models import Person, HostAction, GuestAction
 from django.contrib.auth.decorators import login_required
-from catalog.forms import AddGuestForm, ChangeHostForm, AddPersonForm
-
+from catalog.forms import AddGuestForm, ChangeHostForm, AddPersonForm, AddCommentForm
 
 HOST_COEFFICIENT = 1 # each time you host, it removes this many chances from your probability
 IMMUNITY_PERIOD = 31 # after you host, you won't be asked to host again for this many days
@@ -215,8 +214,31 @@ def change_host(request, pk):
         'form': form,
         'host_action': host_action
     }
-
     return render(request, 'catalog/change_host.html', context)
+
+@login_required
+def add_comment(request, pk):
+    host_action = get_object_or_404(HostAction, pk=pk)
+
+    if request.method == 'POST':
+        form = AddCommentForm(request.POST, initial={'comment': host_action.comment})
+
+        if form.is_valid():
+            new_comment = form.cleaned_data['comment']
+            host_action.comment = new_comment
+            host_action.save()
+            return HttpResponseRedirect(reverse('single-lunch-listing', kwargs={'year':host_action.date.year,
+                                                                                'month':host_action.date.month,
+                                                                                'day':host_action.date.day}))
+    else:
+        form = AddCommentForm(initial={'comment': host_action.comment})
+
+    context = {
+        'form': form,
+        'host_action': host_action
+    }
+    return render(request, 'catalog/add_comment.html', context)
+
 
 # used for debugging
 def reset_hosts(request):

@@ -21,6 +21,7 @@ class HostAction(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4,help_text='Unique ID for this hosting action')
     host = models.ForeignKey('Person', on_delete=models.SET_NULL, null=True, help_text="Person who brings IRG lunch")
     date = models.DateField(null=True, blank=True, help_text="Date of the IRG Lunch hosted")
+    comment = models.TextField(blank=True, help_text="Information about this IRG Lunch, ie, restaurant")
 
     def __str__(self):
         hostname = "-"

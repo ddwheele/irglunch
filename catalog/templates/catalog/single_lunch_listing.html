@@ -5,8 +5,10 @@
 
     <h3>Host</h3>
     <p> {{ host_action.host.name }} </p>
-    <a href="{% url 'change-host' host_action.pk %}">Change Host</a>
 
+    <p> {{ host_action.comment }} </p>
+    <p><a href="{% url 'change-host' host_action.pk %}">Change Host</a> </p>
+    <a href="{% url 'add-comment' host_action.pk %}">Add Comment</a>
   <hr>
 
     <h3>Guests</h3>
