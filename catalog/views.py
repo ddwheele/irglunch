@@ -173,8 +173,10 @@ def add_guest(request, year, month, day):
         already_attending = Person.objects.select_related().filter(guestaction__date=lunchdate).distinct()
         form.fields['guest'].queryset = all_people.difference(already_attending)
 
+    lunchdate = datetime.date(year, month, day)
     context = {
         'form' : form,
+        'date' : lunchdate
     }
 
     return render(request, 'catalog/add_guest.html', context)
