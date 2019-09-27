@@ -11,6 +11,6 @@ urlpatterns = [
     path('add_person', views.add_person, name='add-person'),
     path('calculate_current_month_assignments', views.calculate_current_month_assignments),    
     path('calculate_next_month_assignments', views.calculate_next_month_assignments),    
-    path('reset_hosted_dates', views.reset_hosted_dates)
+    path('reset_hosts', views.reset_hosts)
 ]
     

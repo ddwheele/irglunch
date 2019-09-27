@@ -217,10 +217,12 @@ def change_host(request, pk):
     return render(request, 'catalog/change_host.html', context)
 
 # used for debugging
-def reset_hosted_dates(request):
+def reset_hosts(request):
+    """Make it so all hosts have never hosted. Used for debugging."""
     people = Person.objects.all()
     for peep in people:
         peep.last_hosted = datetime.datetime(year=2000, month=5, day =5)
+        peep.num_host_actions = 0
         peep.save()
     context = {}
     context['peeps'] = people
