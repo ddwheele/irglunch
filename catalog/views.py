@@ -242,11 +242,12 @@ def add_comment(request, pk):
 
 # used for debugging
 def reset_hosts(request):
-    """Make it so all hosts have never hosted. Used for debugging."""
+    """Used for debugging. Make it so all people have attended once and never hosted."""
     people = Person.objects.all()
     for peep in people:
         peep.last_hosted = datetime.datetime(year=2000, month=5, day =5)
         peep.num_host_actions = 0
+        peep.num_guest_actions = 1
         peep.save()
     context = {}
     context['peeps'] = people
