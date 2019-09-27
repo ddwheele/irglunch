@@ -84,6 +84,10 @@ def assign_host(lunchdate):
         else:
             nobody = Person(name=unassigned_name, active=False)
             nobody.save()
+        # if day is already given to "unassigned", don't duplicate it, just return
+        host_action = HostAction.objects.filter(date=lunchdate)
+        if host_action.exists() and (host_action[0].host.name == 'unassigned'):
+            return
         ha = HostAction(date=lunchdate, host=nobody)
         ha.save()
 
