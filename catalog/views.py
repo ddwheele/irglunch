@@ -135,7 +135,7 @@ def next_month(request):
     today = datetime.date.today()
     day_next_month = get_next_month(today)
     host_action_list = HostAction.objects.filter(date__year = day_next_month.year,
-                                                 date__month = day_next_month.month)
+                                                 date__month = day_next_month.month).order_by('date')
     context['host_actions'] = host_action_list
 
     return render(request, 'next_month.html', context=context)
