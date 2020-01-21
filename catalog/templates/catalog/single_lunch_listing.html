@@ -19,5 +19,10 @@
     </ul>
 
     <a href="{% url 'add-guest' date.year date.month date.day%}">Add Guest</a>
+    <br><br>
+    If your name is not in the database, please <a href="{% url 'add-person' %}">add yourself to the database</a> and
+    then navigate back to the proper date. This will keep lunch hosting assignments fair.
+    <br><br>
+    Do not sign up under another person's name!
 
 {% endblock %}

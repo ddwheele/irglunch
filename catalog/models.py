@@ -41,7 +41,7 @@ class GuestAction(models.Model):
     def __str__(self):
         guestname = "-"
         if self.guest is not None:
-            guestname = guest.host.name
+            guestname = self.guest.name
         return guestname + " attended IRG Lunch on " + str(self.date)
 
 
